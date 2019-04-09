@@ -1,0 +1,24 @@
+﻿<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800" MinWidth="800" MinHeight="450">
+    <Grid>
+        <Border Name="Border" BorderBrush="Black" BorderThickness="1" Margin="10,10,235,10">
+            <Canvas Name="DrawingField" PreviewMouseDown="OnMouseDown" MouseDown="OnMouseDown" Background="#FFD6D6D6" MouseUp="Redraw"/>
+        </Border>
+        <StackPanel Name="Choice" HorizontalAlignment="Right" Height="127" Margin="562,10,0,0" VerticalAlignment="Top" Width="220">
+            <RadioButton Name="Vertex" Content="Добавить/удалить вершину" GroupName="Action" IsChecked="True" Checked="Chose"/>
+            <RadioButton Name="Edge" Content="Добавить/удалить ребро" GroupName="Action" IsChecked="False" Checked="Chose"/>
+            <RadioButton Name="SearchWay" Content="Искать минимальный путь" GroupName="Action" IsChecked="False" Checked="Chose"/>
+            <RadioButton Name="SearchDistance" Content="Искать минимальное расстояние" GroupName="Action" IsChecked="False"/>
+        </StackPanel>
+        <Button Name="ClearButton" Content="Очистить" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Width="74"/>
+        <TextBox Name="Cost" HorizontalAlignment="Right" Height="22" Margin="0,146,10,0" TextWrapping="Wrap" Text="1" VerticalAlignment="Top" Width="120" RenderTransformOrigin="0.483,-0.273"/>
+        <Label Name="Label" Content="Вес ребра:" HorizontalAlignment="Right" Margin="0,142,167,0" VerticalAlignment="Top"/>
+
+    </Grid>
+</Window>

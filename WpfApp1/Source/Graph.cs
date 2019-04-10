@@ -37,12 +37,15 @@ namespace WpfApp1
             bool r = g.ContainsKey(p);
 
             if (r)
+            {
+                selected = p;
                 return true;
+            }
             else
             {
                 foreach (var v in g)
                 {
-                    if (Distance(v.Key, p) <= radius*2)
+                    if (Distance(v.Key, p) <= radius * 2)
                     {
                         selected = v.Key;
                         return true;
@@ -65,9 +68,7 @@ namespace WpfApp1
         }
         public bool Add(Point p)
         {
-            bool res = Add(p.X, p.Y);
-            Select(p);
-            return res;
+            return Add(p.X, p.Y);
         }
         void Remove()
         {

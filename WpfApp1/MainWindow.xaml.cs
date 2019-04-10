@@ -70,6 +70,7 @@ namespace WpfApp1
                         if (selected2 == null)
                         {
                             graph.Add(p);
+                            graph.Select(p);
                         }
                         break;
                     case state.Edge:
@@ -93,7 +94,7 @@ namespace WpfApp1
                 switch (s)
                 {
                     case state.Vertex:
-                        if (selected2 == null)
+                        if (selected2 != null)
                         {
                             graph.Remove(p);
                         }
@@ -135,6 +136,14 @@ namespace WpfApp1
                             StrokeThickness = 1,
                             Stroke = Brushes.Black
                         });
+
+                        DrawingField.Children.Add(new Label()
+                        {
+                            Content = v2.Value.ToString(),
+                            Margin = new Thickness((v1.Key.X + v2.Key.X) / 2, (v1.Key.Y + v2.Key.Y) / 2, 0, 0)
+                            
+                        });
+
                         if (lineSet.ContainsKey(v1.Key))
                             lineSet[v1.Key].Add(v2.Key);
                         else

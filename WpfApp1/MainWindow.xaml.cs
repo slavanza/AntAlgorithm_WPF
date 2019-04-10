@@ -80,7 +80,7 @@ namespace WpfApp1
                             bool b = int.TryParse(Cost.Text, out r);
                             if (!b)
                                 r = 1;
-                            graph.Connect(r, selected1.Value);
+                            graph.Connect(r, selected1.Value, selected2.Value);
                         }
                         break;
                     case state.Way:
@@ -104,7 +104,7 @@ namespace WpfApp1
                     case state.Edge:
                         if (selected1 != null && selected2 != null)
                         {
-                            graph.Disconnect(selected1.Value);
+                            graph.Disconnect(selected1.Value, selected2.Value);
                         }
                         break;
                 }
@@ -174,7 +174,7 @@ namespace WpfApp1
             }
             foreach (var v in list)
             {
-                if (v.Key == graph.Selected)
+                if (v.Key == selected1)
                     DrawingField.Children.Add(new Ellipse()
                     {
                         Width = graph.Radius * 2,
@@ -184,6 +184,17 @@ namespace WpfApp1
                         StrokeEndLineCap = PenLineCap.Round,
                         StrokeThickness = 1,
                         Stroke = Brushes.Red
+                    });
+                else if(v.Key == selected2)
+                    DrawingField.Children.Add(new Ellipse()
+                    {
+                        Width = graph.Radius * 2,
+                        Height = graph.Radius * 2,
+                        Margin = new Thickness(v.Key.X - graph.Radius, v.Key.Y - graph.Radius, 0, 0),
+                        StrokeStartLineCap = PenLineCap.Round,
+                        StrokeEndLineCap = PenLineCap.Round,
+                        StrokeThickness = 1,
+                        Stroke = Brushes.Blue
                     });
                 else
                     DrawingField.Children.Add(new Ellipse()
@@ -214,6 +225,13 @@ namespace WpfApp1
             if (Cost != null)
                 Cost.Visibility = Visibility.Hidden;
         }
+
+        private void ClearButton_Click(object sender, RoutedEventArgs e)
+        {
+            graph.G.Clear();
+            DrawingField.Children.Clear();
+        }
+
         void ShowText()
         {
             if (Label != null)

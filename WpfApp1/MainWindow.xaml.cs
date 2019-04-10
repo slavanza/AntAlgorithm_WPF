@@ -84,8 +84,10 @@ namespace WpfApp1
                         }
                         break;
                     case state.Way:
+                        graph.SearchWay(new Point(), new Point()); // Implement
                         break;
                     case state.Distance:
+                        graph.SearchDistance(new Point(), new Point()); // Implement
                         break;
                 }
             }
@@ -105,13 +107,11 @@ namespace WpfApp1
                             graph.Disconnect(selected1.Value);
                         }
                         break;
-                    case state.Way:
-                        break;
-                    case state.Distance:
-                        break;
                 }
             }
         }
+
+
         void Redraw(object sender, MouseButtonEventArgs e)
         {
             var list = graph.G;
@@ -125,6 +125,23 @@ namespace WpfApp1
                 {
                     if (!(lineSet.ContainsKey(v1.Key) && lineSet[v1.Key].Contains(v2.Key)) && !(lineSet.ContainsKey(v2.Key) && lineSet[v2.Key].Contains(v1.Key)))
                     {
+                        if(graph.Way.Contains(v1.Key) && graph.Way.Contains(v2.Key))
+                        {
+                            int n = graph.Way.FindIndex(x => { return x == v1.Key; });
+                            if(graph.Way.ElementAt(n-1) == v2.Key || graph.Way.ElementAt(n+1) == v2.Key)
+                                DrawingField.Children.Add(new Line()
+                                {
+                                    X1 = v1.Key.X,
+                                    X2 = v2.Key.X,
+                                    Y1 = v1.Key.Y,
+                                    Y2 = v2.Key.Y,
+                                    StrokeStartLineCap = PenLineCap.Round,
+                                    StrokeEndLineCap = PenLineCap.Round,
+                                    StrokeThickness = 1,
+                                    Stroke = Brushes.Green
+                                });
+                        }
+                        else
                         DrawingField.Children.Add(new Line()
                         {
                             X1 = v1.Key.X,

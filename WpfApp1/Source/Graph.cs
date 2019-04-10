@@ -10,20 +10,16 @@ namespace WpfApp1
 {
     class Graph
     {
-        int radius = 10;
+        public List<Point> Way { get; private set; }
 
-        public int Radius { get { return radius; } }
+        public int Radius { get; } = 10;
+        public Point? Selected { get; private set; }
 
-        Point? selected;
-        public Point? Selected { get {return selected;} }
-
-        Dictionary<Point, Dictionary<Point, int>> g;
-
-        public Dictionary<Point, Dictionary<Point, int>> G { get { return g; } }
+        public Dictionary<Point, Dictionary<Point, int>> G { get; }
 
         public Graph()
         {
-            g = new Dictionary<Point, Dictionary<Point, int>>();
+            G = new Dictionary<Point, Dictionary<Point, int>>();
         }
 
         static double Distance(Point p1, Point p2)
@@ -34,20 +30,20 @@ namespace WpfApp1
         bool Select(double x, double y)
         {
             Point p = new Point(x, y);
-            bool r = g.ContainsKey(p);
+            bool r = G.ContainsKey(p);
 
             if (r)
             {
-                selected = p;
+                Selected = p;
                 return true;
             }
             else
             {
-                foreach (var v in g)
+                foreach (var v in G)
                 {
-                    if (Distance(v.Key, p) <= radius * 2)
+                    if (Distance(v.Key, p) <= Radius * 2)
                     {
-                        selected = v.Key;
+                        Selected = v.Key;
                         return true;
                     }
                 }
@@ -60,8 +56,8 @@ namespace WpfApp1
         }
         bool Add(double x, double y)
         {
-            if (!g.ContainsKey(new Point(x, y)))
-                g.Add(new Point(x, y), new Dictionary<Point, int>());
+            if (!G.ContainsKey(new Point(x, y)))
+                G.Add(new Point(x, y), new Dictionary<Point, int>());
             else
                 return false;
             return true;
@@ -72,14 +68,14 @@ namespace WpfApp1
         }
         void Remove()
         {
-            if (selected != null)
+            if (Selected != null)
             {
-                foreach (var v in g)
+                foreach (var v in G)
                 {
-                    if (v.Value.ContainsKey(selected.Value))
-                        v.Value.Remove(selected.Value);
+                    if (v.Value.ContainsKey(Selected.Value))
+                        v.Value.Remove(Selected.Value);
                 }
-                g.Remove(selected.Value);
+                G.Remove(Selected.Value);
             }
         }
         void Remove(double x, double y)
@@ -93,16 +89,16 @@ namespace WpfApp1
         }
         bool Connect(int i, double x, double y)
         {
-            if (selected == null)
+            if (Selected == null)
                 return false;
-            if (selected.Value.X == x && selected.Value.Y == y)
+            if (Selected.Value.X == x && Selected.Value.Y == y)
                 return false;
 
             Point p = new Point(x, y);
-            if (g[selected.Value].ContainsKey(p) && g[p].ContainsKey(selected.Value))
+            if (G[Selected.Value].ContainsKey(p) || G[p].ContainsKey(Selected.Value))
                 return false;
-            g[selected.Value].Add(p, i);
-            g[p].Add(selected.Value, i);
+            G[Selected.Value].Add(p, i);
+            G[p].Add(Selected.Value, i);
 
             return true;
         }
@@ -112,14 +108,25 @@ namespace WpfApp1
         }
         void Disconnect(double x, double y)
         {
-            if(selected != null)
+            if(Selected != null)
             {
-                g[selected.Value].Remove(new Point(x, y));
+                G[Selected.Value].Remove(new Point(x, y));
             }
         }
         public void Disconnect(Point p)
         {
             Disconnect(p.X, p.Y);
+        }
+        
+        // TODO: Implement searching
+        public List<Point> SearchWay(Point p1, Point p2)
+        {
+            return new List<Point>()
+;
+        }
+        public List<Point> SearchDistance(Point p1, Point p2)
+        {
+            return new List<Point>();
         }
     }
 }

@@ -228,7 +228,7 @@ namespace WpfApp1
 
         private void ClearButton_Click(object sender, RoutedEventArgs e)
         {
-            graph.G.Clear();
+            graph.Clear();
             DrawingField.Children.Clear();
         }
 

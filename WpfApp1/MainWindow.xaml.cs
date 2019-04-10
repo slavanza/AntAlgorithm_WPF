@@ -23,8 +23,6 @@ namespace WpfApp1
     {
         enum state { Vertex, Edge, Way, Distance };
 
-        Point? selected1, selected2;
-
         Graph graph;
 
         public MainWindow()
@@ -32,9 +30,6 @@ namespace WpfApp1
             graph = new Graph();
 
             InitializeComponent();
-
-            Label.Visibility = Visibility.Hidden;
-            Cost.Visibility = Visibility.Hidden;
         }
 
         state CheckState()
@@ -56,31 +51,32 @@ namespace WpfApp1
 
             state s = CheckState();
 
-            Point p = args.GetPosition((IInputElement)sender);
-
-            selected1 = graph.Selected;
-            selected2 = graph.Select(p);
+            Point p = args.GetPosition(sender as IInputElement);
+            
 
             if (args.LeftButton == MouseButtonState.Pressed)
             {
-
                 switch (s)
                 {
                     case state.Vertex:
-                        if (selected2 == null)
+                        if (graph.Nearest(p) == null)
                         {
                             graph.Add(p);
-                            graph.Select(p);
                         }
+                        else
+                            graph.Select(p);
                         break;
                     case state.Edge:
-                        if (selected1 != null && selected2 != null)
+                        graph.Select(p);
+                        if (graph.LastSelected != null && graph.Selected != null)
                         {
-                            int r;
-                            bool b = int.TryParse(Cost.Text, out r);
-                            if (!b)
-                                r = 1;
-                            graph.Connect(r, selected1.Value, selected2.Value);
+                            CostDialog dialog = new CostDialog();
+                            if (dialog.ShowDialog() == true)
+                            {
+                                int r = dialog.Cost;
+                                graph.Connect(r, graph.LastSelected.Value, graph.Selected.Value);
+                                Redraw(sender, args);
+                            }
                         }
                         break;
                     case state.Way:
@@ -96,15 +92,15 @@ namespace WpfApp1
                 switch (s)
                 {
                     case state.Vertex:
-                        if (selected2 != null)
+                        if (graph.Selected != null)
                         {
                             graph.Remove(p);
                         }
                         break;
                     case state.Edge:
-                        if (selected1 != null && selected2 != null)
+                        if (graph.LastSelected != null && graph.Selected != null)
                         {
-                            graph.Disconnect(selected1.Value, selected2.Value);
+                            graph.Disconnect(graph.LastSelected.Value, graph.Selected.Value);
                         }
                         break;
                 }
@@ -119,6 +115,7 @@ namespace WpfApp1
 
             var lineSet = new Dictionary<Point, List<Point>>();
 
+            //Lines
             foreach (var v1 in list)
             {
                 foreach (var v2 in v1.Value)
@@ -172,9 +169,10 @@ namespace WpfApp1
 
                 }
             }
+            // Circles
             foreach (var v in list)
             {
-                if (v.Key == selected1)
+                if (v.Key == graph.Selected) // red
                     DrawingField.Children.Add(new Ellipse()
                     {
                         Width = graph.Radius * 2,
@@ -185,18 +183,7 @@ namespace WpfApp1
                         StrokeThickness = 1,
                         Stroke = Brushes.Red
                     });
-                else if(v.Key == selected2)
-                    DrawingField.Children.Add(new Ellipse()
-                    {
-                        Width = graph.Radius * 2,
-                        Height = graph.Radius * 2,
-                        Margin = new Thickness(v.Key.X - graph.Radius, v.Key.Y - graph.Radius, 0, 0),
-                        StrokeStartLineCap = PenLineCap.Round,
-                        StrokeEndLineCap = PenLineCap.Round,
-                        StrokeThickness = 1,
-                        Stroke = Brushes.Blue
-                    });
-                else
+                else // black
                     DrawingField.Children.Add(new Ellipse()
                     {
                         Width = graph.Radius * 2,
@@ -210,34 +197,11 @@ namespace WpfApp1
             }
 
         }
-        void Chose(object sender, RoutedEventArgs args)
-        {
-            var s = (RadioButton)sender;
-            if (s == Edge)
-                ShowText();
-            else
-                HideText();
-        }
-        void HideText()
-        {
-            if (Label != null)
-                Label.Visibility = Visibility.Hidden;
-            if (Cost != null)
-                Cost.Visibility = Visibility.Hidden;
-        }
 
         private void ClearButton_Click(object sender, RoutedEventArgs e)
         {
             graph.Clear();
             DrawingField.Children.Clear();
-        }
-
-        void ShowText()
-        {
-            if (Label != null)
-                Label.Visibility = Visibility.Visible;
-            if (Cost != null)
-                Cost.Visibility = Visibility.Visible;
         }
     }
 }

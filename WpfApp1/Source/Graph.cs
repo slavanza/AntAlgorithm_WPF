@@ -14,13 +14,19 @@ namespace WpfApp1
         public List<Point> Way { get; private set; }
 
         public int Radius { get; } = 10;
-        public Point? Selected { get; private set; }
+
+        Point selected, lastSelected;
+
+        public Point? LastSelected { get { return lastSelected == new Point(-1, -1) ? null : new Point?(lastSelected); } private set { lastSelected = value == null ? new Point(-1, -1) : value.Value; } }
+        public Point? Selected { get { return selected == new Point(-1, -1) ? null : new Point?(selected); } private set { selected = value == null ? new Point(-1, -1) : value.Value; } }
 
         public Dictionary<Point, Dictionary<Point, int>> G { get; }
 
         // Functions
         public Graph()
         {
+            lastSelected = new Point(-1, -1);
+            selected = new Point(-1, -1);
             Way = new List<Point>();
             G = new Dictionary<Point, Dictionary<Point, int>>();
         }
@@ -30,7 +36,7 @@ namespace WpfApp1
             return Math.Sqrt(Math.Pow(Math.Abs(p1.X - p2.X), 2) + Math.Pow(Math.Abs(p1.Y - p2.Y), 2));
         }
 
-        Point? Nearest(Point p)
+        public Point? Nearest(Point p)
         {
             foreach (var v in G)
             {
@@ -40,97 +46,41 @@ namespace WpfApp1
             return null;
         }
 
-        bool Select(double x, double y)
-        {
-            Point p = new Point(x, y);
-            bool r = G.ContainsKey(p);
-
-            if (r)
-            {
-                Selected = p;
-                return true;
-            }
-            else
-            {
-                foreach (var v in G)
-                {
-                    if (Distance(v.Key, p) <= Radius * 2)
-                    {
-                        Selected = v.Key;
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
         public Point? Select(Point p)
         {
-            if (Select(p.X, p.Y) != false)
-                return Nearest(p);
-            else return null;
-        }
-        bool Add(double x, double y)
-        {
-            if (!G.ContainsKey(new Point(x, y)))
-                G.Add(new Point(x, y), new Dictionary<Point, int>());
-            else
-                return false;
-            return true;
+            lastSelected = new Point(selected.X, selected.Y);
+            Point? n = Nearest(p);
+            selected = n == null ? new Point(-1, -1) : n.Value;
+            return selected;
         }
         public bool Add(Point p)
         {
-            return Add(p.X, p.Y);
-        }
-        void Remove()
-        {
-            if (Selected != null)
+            if (!G.ContainsKey(p))
             {
-                foreach (var v in G)
-                {
-                    if (v.Value.ContainsKey(Selected.Value))
-                        v.Value.Remove(Selected.Value);
-                }
-                G.Remove(Selected.Value);
+                G.Add(p, new Dictionary<Point, int>());
             }
-        }
-        void Remove(double x, double y)
-        {
-            Select(x, y);
-            Remove();
+            else
+                return false;
+            return true;
         }
         public void Remove(Point p)
         {
-            Remove(p.X, p.Y);
+            foreach (var v in G)
+            {
+                if (v.Value.ContainsKey(p))
+                    v.Value.Remove(p);
+                if (v.Key == p)
+                    G.Remove(p);
+            }
         }
-        bool Connect(int i, double x, double y)
-        {
-            if (Selected == null)
-                return false;
-            if (Selected.Value.X == x && Selected.Value.Y == y)
-                return false;
-
-            Point? p = Nearest(new Point(x, y));
-            if (p == null)
-                return false;
-            if (G[Selected.Value].ContainsKey(p.Value) || G[p.Value].ContainsKey(Selected.Value))
-                return false;
-            G[Selected.Value].Add(p.Value, i);
-            G[p.Value].Add(Selected.Value, i);
-
-            return true;
-        }
-        public bool Connect(int i, Point p)
-        {
-            return Connect(i, p.X, p.Y);
-        }
-        public bool Connect(int i , Point p1, Point p2)
+        public bool Connect(int i, Point p1, Point p2)
         {
             if (!G.ContainsKey(p1) && !G.ContainsKey(p2))
                 return false;
             if (p1 == p2)
                 return false;
 
-            foreach(var v in G)
+            foreach (var v in G)
             {
                 if (v.Key == p1 && !v.Value.ContainsKey(p2))
                     v.Value.Add(p2, i);
@@ -140,20 +90,9 @@ namespace WpfApp1
 
             return true;
         }
-        void Disconnect(double x, double y)
-        {
-            if(Selected != null)
-            {
-                G[Selected.Value].Remove(new Point(x, y));
-            }
-        }
-        public void Disconnect(Point p)
-        {
-            Disconnect(p.X, p.Y);
-        }
         public void Disconnect(Point p1, Point p2)
         {
-            foreach(var v in G)
+            foreach (var v in G)
             {
                 if (v.Key == p1)
                     v.Value.Remove(p2);
@@ -161,6 +100,8 @@ namespace WpfApp1
                     v.Value.Remove(p1);
             }
         }
+
+
         // TODO: Implement searching
         public List<Point> SearchWay(Point p1, Point p2)
         {

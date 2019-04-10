@@ -65,13 +65,17 @@ namespace WpfApp1
         }
         public void Remove(Point p)
         {
+            var d = Nearest(p);
+            if (d == null)
+                return;
+            else
+                p = d.Value;
             foreach (var v in G)
             {
                 if (v.Value.ContainsKey(p))
                     v.Value.Remove(p);
-                if (v.Key == p)
-                    G.Remove(p);
             }
+            G.Remove(p);
         }
         public bool Connect(int i, Point p1, Point p2)
         {

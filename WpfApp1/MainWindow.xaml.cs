@@ -70,12 +70,15 @@ namespace WpfApp1
                         graph.Select(p);
                         if (graph.LastSelected != null && graph.Selected != null)
                         {
-                            CostDialog dialog = new CostDialog();
-                            if (dialog.ShowDialog() == true)
+                            if (graph.LastSelected != graph.Selected)
                             {
-                                int r = dialog.Cost;
-                                graph.Connect(r, graph.LastSelected.Value, graph.Selected.Value);
-                                Redraw(sender, args);
+                                CostDialog dialog = new CostDialog();
+                                if (dialog.ShowDialog() == true)
+                                {
+                                    int r = dialog.Cost;
+                                    graph.Connect(r, graph.LastSelected.Value, graph.Selected.Value);
+                                    Redraw(sender, args);
+                                }
                             }
                         }
                         break;
@@ -92,6 +95,7 @@ namespace WpfApp1
                 switch (s)
                 {
                     case state.Vertex:
+                        graph.Select(p);
                         if (graph.Selected != null)
                         {
                             graph.Remove(p);

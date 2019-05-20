@@ -84,16 +84,25 @@ namespace WpfApp1
             if (p1 == p2)
                 return false;
 
-            foreach (var v in G)
-            {
-                if (v.Key == p1 && !v.Value.ContainsKey(p2))
-                    v.Value.Add(p2, i);
-                if (v.Key == p2 && !v.Value.ContainsKey(p1))
-                    v.Value.Add(p1, i);
-            }
+            if (!G[p1].ContainsKey(p2))
+                G[p1].Add(p2, i);
+            if (!G[p2].ContainsKey(p1))
+                G[p2].Add(p1, i);
 
             return true;
         }
+
+        public bool AreConnected(Point p1, Point p2)
+        {
+            if (!G.ContainsKey(p1) && !G.ContainsKey(p2))
+                return false;
+            if (p1 == p2)
+                return true;
+            if (G[p1].ContainsKey(p2) && G[p2].ContainsKey(p1))
+                return true;
+            return false;
+        }
+
         public void Disconnect(Point p1, Point p2)
         {
             foreach (var v in G)

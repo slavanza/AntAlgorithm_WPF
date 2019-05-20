@@ -70,7 +70,7 @@ namespace WpfApp1
                         graph.Select(p);
                         if (graph.LastSelected != null && graph.Selected != null)
                         {
-                            if (graph.LastSelected != graph.Selected)
+                            if (!graph.AreConnected(graph.LastSelected.Value, graph.Selected.Value))
                             {
                                 CostDialog dialog = new CostDialog();
                                 if (dialog.ShowDialog() == true)
@@ -102,10 +102,12 @@ namespace WpfApp1
                         }
                         break;
                     case state.Edge:
+                        graph.Select(p);
                         if (graph.LastSelected != null && graph.Selected != null)
                         {
                             graph.Disconnect(graph.LastSelected.Value, graph.Selected.Value);
                         }
+                        
                         break;
                 }
             }

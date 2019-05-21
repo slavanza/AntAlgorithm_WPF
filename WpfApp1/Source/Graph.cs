@@ -17,8 +17,13 @@ namespace WpfApp1
 
         Point selected, lastSelected;
 
+        Point begin, end;
+
         public Point? LastSelected { get { return lastSelected == new Point(-1, -1) ? null : new Point?(lastSelected); } private set { lastSelected = value == null ? new Point(-1, -1) : value.Value; } }
         public Point? Selected { get { return selected == new Point(-1, -1) ? null : new Point?(selected); } private set { selected = value == null ? new Point(-1, -1) : value.Value; } }
+
+        public Point? Begin { get { return begin == new Point(-1, -1) ? null : new Point?(begin); } }
+        public Point? End { get { return end == new Point(-1, -1) ? null : new Point?(end); } }
 
         public Dictionary<Point, Dictionary<Point, int>> G { get; }
 
@@ -114,6 +119,45 @@ namespace WpfApp1
             }
         }
 
+        public bool SetBegin(Point p)
+        {
+            bool result = false;
+
+            Point? point = Nearest(p);
+
+            if(point != null)
+            {
+                result = true;
+                begin = point.Value;
+            }
+
+            return result;
+        }
+
+        public bool SetEnd(Point p)
+        {
+            bool result = false;
+
+            Point? point = Nearest(p);
+
+            if (point != null)
+            {
+                result = true;
+                end = point.Value;
+            }
+
+            return result;
+        }
+
+        public void ResetBegin()
+        {
+            begin = new Point(-1, -1);
+        }
+
+        public void ResetEnd()
+        {
+            end = new Point(-1, -1);
+        }
 
         // TODO: Implement searching
         public List<Point> SearchWay(Point p1, Point p2)

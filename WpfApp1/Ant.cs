@@ -32,9 +32,6 @@ namespace WpfApp1
             Current = c;
             Destination = d;
         }
-        Ant(Dictionary<Point, Dictionary<Point, int>> g) : this(g, g.First().Key, g.Last().Key)
-        {
-        }
 
         public void Configure(Point cur, Point dest)
         {

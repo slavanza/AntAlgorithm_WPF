@@ -15,6 +15,8 @@
             <RadioButton Name="Edge" Content="Добавить/удалить ребро" GroupName="Action" IsChecked="False"/>
             <RadioButton Name="SearchWay" Content="Искать минимальный путь" GroupName="Action" IsChecked="False"/>
             <RadioButton Name="SearchDistance" Content="Искать минимальное расстояние" GroupName="Action" IsChecked="False"/>
+            <RadioButton Name="Begin" Content="Задать начало" GroupName="Action" IsChecked="False"/>
+            <RadioButton Name="End" Content="Задать конец" GroupName="Action" IsChecked="False"/>
         </StackPanel>
         <Button Name="ClearButton" Content="Очистить" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Width="74" Click="ClearButton_Click"/>
 

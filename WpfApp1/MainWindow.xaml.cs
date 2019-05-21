@@ -21,7 +21,7 @@ namespace WpfApp1
     /// </summary>
     public partial class MainWindow : Window
     {
-        enum state { Vertex, Edge, Way, Distance };
+        enum state { Vertex, Edge, Way, Distance, Begin, End };
 
         Graph graph;
 
@@ -35,14 +35,20 @@ namespace WpfApp1
         state CheckState()
         {
             state res = state.Vertex;
-            if (Vertex.IsChecked.Value)
-                res = state.Vertex;
             if (Edge.IsChecked.Value)
                 res = state.Edge;
+            else
             if (SearchWay.IsChecked.Value)
                 res = state.Way;
+            else
             if (SearchDistance.IsChecked.Value)
                 res = state.Distance;
+            else
+            if (Begin.IsChecked.Value)
+                res = state.Begin;
+            else
+            if (End.IsChecked.Value)
+                res = state.End;
             return res;
         }
 
@@ -88,6 +94,14 @@ namespace WpfApp1
                     case state.Distance:
                         graph.SearchDistance(new Point(), new Point()); // Implement
                         break;
+                    case state.Begin:
+                        graph.Select(p);
+                        graph.SetBegin(p);
+                        break;
+                    case state.End:
+                        graph.Select(p);
+                        graph.SetEnd(p);
+                        break;
                 }
             }
             else if (args.RightButton == MouseButtonState.Pressed)
@@ -107,7 +121,12 @@ namespace WpfApp1
                         {
                             graph.Disconnect(graph.LastSelected.Value, graph.Selected.Value);
                         }
-                        
+                        break;
+                    case state.Begin:
+                        graph.ResetBegin();
+                        break;
+                    case state.End:
+                        graph.ResetEnd();
                         break;
                 }
             }
@@ -160,7 +179,8 @@ namespace WpfApp1
                         DrawingField.Children.Add(new Label()
                         {
                             Content = v2.Value.ToString(),
-                            Margin = new Thickness((v1.Key.X + v2.Key.X) / 2, (v1.Key.Y + v2.Key.Y) / 2, 0, 0)
+                            Margin = new Thickness((v1.Key.X + v2.Key.X) / 2 + 10, (v1.Key.Y + v2.Key.Y) / 2 + 10, 0, 0),
+                            Foreground = Brushes.DarkOrange
                             
                         });
 
@@ -178,28 +198,36 @@ namespace WpfApp1
             // Circles
             foreach (var v in list)
             {
-                if (v.Key == graph.Selected) // red
-                    DrawingField.Children.Add(new Ellipse()
-                    {
-                        Width = graph.Radius * 2,
-                        Height = graph.Radius * 2,
-                        Margin = new Thickness(v.Key.X - graph.Radius, v.Key.Y - graph.Radius, 0, 0),
-                        StrokeStartLineCap = PenLineCap.Round,
-                        StrokeEndLineCap = PenLineCap.Round,
-                        StrokeThickness = 1,
-                        Stroke = Brushes.Red
-                    });
-                else // black
-                    DrawingField.Children.Add(new Ellipse()
-                    {
-                        Width = graph.Radius * 2,
-                        Height = graph.Radius * 2,
-                        Margin = new Thickness(v.Key.X - graph.Radius, v.Key.Y - graph.Radius, 0, 0),
-                        StrokeStartLineCap = PenLineCap.Round,
-                        StrokeEndLineCap = PenLineCap.Round,
-                        StrokeThickness = 1,
-                        Stroke = Brushes.Black
-                    });
+                bool isSelected = false, isBegin = false, isEnd = false;
+                if (v.Key == graph.Selected) // red bounds
+                    isSelected = true;
+                if (v.Key == graph.Begin) // green filling
+                    isBegin = true;
+                if (v.Key == graph.End) // blue filling
+                    isEnd = true;
+
+                Brush border = Brushes.Black, fill = null;
+
+                if (isSelected)
+                    border = Brushes.Red;
+                if (isBegin)
+                    fill = Brushes.Lime;
+                else if (isEnd)
+                    fill = Brushes.Cyan;
+                if (isBegin && isEnd)
+                    fill = Brushes.Yellow;
+
+                DrawingField.Children.Add(new Ellipse()
+                {
+                    Width = graph.Radius * 2,
+                    Height = graph.Radius * 2,
+                    Margin = new Thickness(v.Key.X - graph.Radius, v.Key.Y - graph.Radius, 0, 0),
+                    StrokeStartLineCap = PenLineCap.Round,
+                    StrokeEndLineCap = PenLineCap.Round,
+                    StrokeThickness = 1,
+                    Stroke = border,
+                    Fill = fill
+                });
             }
 
         }

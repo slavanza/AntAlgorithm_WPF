@@ -18,33 +18,57 @@ namespace WpfApp1
         int numPoints;
         int lenWay;
         // Functions
-        Ant(Dictionary<Point, Dictionary<Point, int>> g, Point c, Point d)
+        public Ant(Dictionary<Point, Dictionary<Point, int>> g, Point cur, Point dest)
         {
             numPoints = 0;
             lenWay = 0;
 
             visited = new List<Point>();
-            visited.Add(c);
+            visited.Add(cur);
             way = new Queue<Point>();
-            way.Enqueue(c);
+            way.Enqueue(cur);
             graph = g;
 
-            Current = c;
-            Destination = d;
-        }
-
-        public void Configure(Point cur, Point dest)
-        {
             Current = cur;
             Destination = dest;
         }
 
-        void Move(Point p)
+        public void SetDestination(Point p)
+        {
+            Destination = p;
+        }
+        public void SetCurrent(Point p)
+        {
+            Current = p;
+            visited.Add(p);
+        }
+
+        public bool Move(Point p)
         {
             lenWay += graph[Current][p];
             numPoints++;
             visited.Add(p);
             way.Enqueue(p);
+            if (!visited.Contains(p))
+                return true;
+            else
+                return false;
+        }
+
+        public bool MoveToNearest()
+        {
+            var ways = graph[Current];
+            Point p = new Point(-1, -1);
+            int min = int.MaxValue;
+            foreach (var v in ways)
+            {
+                if (v.Value < min && !visited.Contains(v.Key))
+                {
+                    min = v.Value;
+                    p = v.Key;
+                }
+            }
+            return Move(p);
         }
     }
 }

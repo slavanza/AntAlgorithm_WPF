@@ -17,7 +17,7 @@ namespace WpfApp1
 
         Point selected, lastSelected;
 
-        Point begin, end;
+        Point begin, end; // begin = anthill, end = food
 
         public Point? LastSelected { get { return lastSelected == new Point(-1, -1) ? null : new Point?(lastSelected); } private set { lastSelected = value == null ? new Point(-1, -1) : value.Value; } }
         public Point? Selected { get { return selected == new Point(-1, -1) ? null : new Point?(selected); } private set { selected = value == null ? new Point(-1, -1) : value.Value; } }
@@ -168,6 +168,24 @@ namespace WpfApp1
         public List<Point> SearchDistance(Point p1, Point p2)
         {
             return new List<Point>();
+        }
+
+        public List<Point> AntAlgorythm(Point p1, Point p2) // p1 = начало, p2 = конец
+        {
+            var ants = new List<Ant>();
+            foreach(var v in G) // в каждой вершине будет по муравью, все они попытаются двигаться к концу маршрута, а потом возвращаются в начало (v -> p2 -> p1)
+            {
+                ants.Add(new Ant(G, v.Key, p2));
+            }
+
+            for(var i = 0; i < ants.Count; i++) // случайное передвижение к ближайшей вершине
+            {
+                ants.ElementAt(i).MoveToNearest();
+            }
+            /// [TODO] : Implement the main part of algorythm
+            /// Pheromone : -
+            /// Moving : +/-
+
         }
 
         internal void Clear()

@@ -13,12 +13,12 @@
         <StackPanel Name="Choice" HorizontalAlignment="Right" Height="127" Margin="562,10,0,0" VerticalAlignment="Top" Width="220">
             <RadioButton Name="Vertex" Content="Добавить/удалить вершину" GroupName="Action" IsChecked="True"/>
             <RadioButton Name="Edge" Content="Добавить/удалить ребро" GroupName="Action" IsChecked="False"/>
-            <RadioButton Name="SearchWay" Content="Искать минимальный путь" GroupName="Action" IsChecked="False"/>
-            <RadioButton Name="SearchDistance" Content="Искать минимальное расстояние" GroupName="Action" IsChecked="False"/>
             <RadioButton Name="Begin" Content="Задать начало" GroupName="Action" IsChecked="False"/>
             <RadioButton Name="End" Content="Задать конец" GroupName="Action" IsChecked="False"/>
         </StackPanel>
         <Button Name="ClearButton" Content="Очистить" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Width="74" Click="ClearButton_Click"/>
+        <Button x:Name="SearchButton" Content="Построить путь" HorizontalAlignment="Right" Margin="0,0,131,35" VerticalAlignment="Bottom" Click="SearchButton_Click"/>
+        <Button x:Name="ClearWayButton" Content="Очистить путь" HorizontalAlignment="Right" Margin="0,0,131,10" VerticalAlignment="Bottom" Click="ClearWayButton_Click" Width="89"/>
 
     </Grid>
 </Window>

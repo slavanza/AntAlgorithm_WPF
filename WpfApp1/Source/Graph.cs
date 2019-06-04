@@ -10,7 +10,8 @@ namespace WpfApp1
 {
     class Graph
     {
-        // Variables (Referenses)
+        
+        #region [Variables(Referenses)]
         public List<Point> Way { get; private set; }
 
         public int Radius { get; } = 10;
@@ -25,20 +26,20 @@ namespace WpfApp1
         public Point? Begin { get { return begin == new Point(-1, -1) ? null : new Point?(begin); } }
         public Point? End { get { return end == new Point(-1, -1) ? null : new Point?(end); } }
 
-        public Dictionary<Point, Dictionary<Point, int>> G { get; }
-
-        // Functions
+        public Dictionary<Point, Dictionary<Point, double>> G { get; }
+        #endregion
+        #region [Functions]
         public Graph()
         {
             lastSelected = new Point(-1, -1);
             selected = new Point(-1, -1);
             Way = new List<Point>();
-            G = new Dictionary<Point, Dictionary<Point, int>>();
+            G = new Dictionary<Point, Dictionary<Point, double>>();
         }
 
-        static double Distance(Point p1, Point p2)
+        static public double Distance(Point p1, Point p2)
         {
-            return Math.Sqrt(Math.Pow(Math.Abs(p1.X - p2.X), 2) + Math.Pow(Math.Abs(p1.Y - p2.Y), 2));
+            return Math.Sqrt(Math.Pow(p1.X - p2.X, 2) + Math.Pow(p1.Y - p2.Y, 2));
         }
 
         public Point? Nearest(Point p)
@@ -62,7 +63,7 @@ namespace WpfApp1
         {
             if (!G.ContainsKey(p))
             {
-                G.Add(p, new Dictionary<Point, int>());
+                G.Add(p, new Dictionary<Point, double>());
             }
             else
                 return false;
@@ -82,7 +83,7 @@ namespace WpfApp1
             }
             G.Remove(p);
         }
-        public bool Connect(int i, Point p1, Point p2)
+        public bool Connect(double i, Point p1, Point p2)
         {
             if (!G.ContainsKey(p1) && !G.ContainsKey(p2))
                 return false;
@@ -170,22 +171,52 @@ namespace WpfApp1
             return new List<Point>();
         }
 
-        public List<Point> AntAlgorythm(Point p1, Point p2) // p1 = начало, p2 = конец
+        public List<Point> AStar(Point p1, Point p2) // p1 = начало, p2 = конец
         {
-            var ants = new List<Ant>();
-            foreach(var v in G) // в каждой вершине будет по муравью, все они попытаются двигаться к концу маршрута, а потом возвращаются в начало (v -> p2 -> p1)
+            var closed = new List<Point>();
+
+            var open = new List<Point>();
+
+            var from = new Dictionary<Point, Point>();
+
+            open.Add(p1);
+            while (open.Count > 0)
             {
-                ants.Add(new Ant(G, v.Key, p2));
+                open = open.OrderBy(_p => Distance(p2, _p)).ToList();
+                var p = open.First();
+                if (p == p2)
+                {
+                    Way = MakeWay(from, p2);
+                    return Way;
+                }
+                open.Remove(p);
+                closed.Add(p);
+                foreach (var v in G[p])
+                {
+                    if (!closed.Contains(v.Key))
+                    {
+                        open.Add(v.Key);
+                        from[v.Key] = p;
+                    }
+                }
             }
 
-            for(var i = 0; i < ants.Count; i++) // случайное передвижение к ближайшей вершине
-            {
-                ants.ElementAt(i).MoveToNearest();
-            }
-            /// [TODO] : Implement the main part of algorythm
-            /// Pheromone : -
-            /// Moving : +/-
+            
 
+            return new List<Point>();
+        }
+
+        private List<Point> MakeWay(Dictionary<Point, Point> from, Point p)
+        {
+            var way = new List<Point>();
+            Point cur = p;
+            while(from.ContainsKey(cur))
+            {
+                way.Add(cur);
+                cur = from[cur];
+            }
+            way.Add(cur);
+            return way;
         }
 
         internal void Clear()
@@ -193,5 +224,6 @@ namespace WpfApp1
             G.Clear();
             Way.Clear();
         }
+        #endregion
     }
 }

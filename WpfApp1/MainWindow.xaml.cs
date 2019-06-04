@@ -21,7 +21,7 @@ namespace WpfApp1
     /// </summary>
     public partial class MainWindow : Window
     {
-        enum state { Vertex, Edge, Way, Distance, Begin, End };
+        enum state { Vertex, Edge, Begin, End };
 
         Graph graph;
 
@@ -37,12 +37,6 @@ namespace WpfApp1
             state res = state.Vertex;
             if (Edge.IsChecked.Value)
                 res = state.Edge;
-            else
-            if (SearchWay.IsChecked.Value)
-                res = state.Way;
-            else
-            if (SearchDistance.IsChecked.Value)
-                res = state.Distance;
             else
             if (Begin.IsChecked.Value)
                 res = state.Begin;
@@ -78,21 +72,15 @@ namespace WpfApp1
                         {
                             if (!graph.AreConnected(graph.LastSelected.Value, graph.Selected.Value))
                             {
-                                CostDialog dialog = new CostDialog();
-                                if (dialog.ShowDialog() == true)
-                                {
-                                    int r = dialog.Cost;
-                                    graph.Connect(r, graph.LastSelected.Value, graph.Selected.Value);
-                                    Redraw(sender, args);
-                                }
+                                //CostDialog dialog = new CostDialog();
+                                //if (dialog.ShowDialog() == true)
+                                //{
+                                double r = Graph.Distance(graph.LastSelected.Value, graph.Selected.Value); //dialog.Cost;
+                                graph.Connect(r, graph.LastSelected.Value, graph.Selected.Value);
+                                Redraw(sender, args);
+                                //}
                             }
                         }
-                        break;
-                    case state.Way:
-                        graph.SearchWay(new Point(), new Point()); // Implement
-                        break;
-                    case state.Distance:
-                        graph.SearchDistance(new Point(), new Point()); // Implement
                         break;
                     case state.Begin:
                         graph.Select(p);
@@ -149,9 +137,7 @@ namespace WpfApp1
                     {
                         if(graph.Way.Contains(v1.Key) && graph.Way.Contains(v2.Key))
                         {
-                            int n = graph.Way.FindIndex(x => { return x == v1.Key; });
-                            if(graph.Way.ElementAt(n-1) == v2.Key || graph.Way.ElementAt(n+1) == v2.Key)
-                                DrawingField.Children.Add(new Line()
+                            DrawingField.Children.Add(new Line()
                                 {
                                     X1 = v1.Key.X,
                                     X2 = v2.Key.X,
@@ -178,10 +164,10 @@ namespace WpfApp1
 
                         DrawingField.Children.Add(new Label()
                         {
-                            Content = v2.Value.ToString(),
-                            Margin = new Thickness((v1.Key.X + v2.Key.X) / 2 + 10, (v1.Key.Y + v2.Key.Y) / 2 + 10, 0, 0),
-                            Foreground = Brushes.DarkOrange
-                            
+                            Content = Math.Round(v2.Value, 1).ToString(),
+                            Margin = new Thickness((v1.Key.X + v2.Key.X) / 2 - 10, (v1.Key.Y + v2.Key.Y) / 2 - 10, (v1.Key.X + v2.Key.X) / 2 + 10, (v1.Key.Y + v2.Key.Y) / 2 + 10),
+                            Foreground = Brushes.Red,
+                            Background = DrawingField.Background
                         });
 
                         if (lineSet.ContainsKey(v1.Key))
@@ -214,6 +200,12 @@ namespace WpfApp1
                     fill = Brushes.Lime;
                 else if (isEnd)
                     fill = Brushes.Cyan;
+                else
+                if (graph.Way.Contains(v.Key))
+                {
+                    border = Brushes.Green;
+                    fill = Brushes.White;
+                }
                 if (isBegin && isEnd)
                     fill = Brushes.Yellow;
 
@@ -236,6 +228,21 @@ namespace WpfApp1
         {
             graph.Clear();
             DrawingField.Children.Clear();
+        }
+
+        private void SearchButton_Click(object sender, RoutedEventArgs e)
+        {
+            if(graph.Begin != null && graph.End != null)
+            {
+                graph.AStar(graph.Begin.Value, graph.End.Value);
+                Redraw(sender, null);
+            }
+        }
+
+        private void ClearWayButton_Click(object sender, RoutedEventArgs e)
+        {
+            graph.Way.Clear();
+            Redraw(sender, null);
         }
     }
 }
